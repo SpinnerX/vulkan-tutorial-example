@@ -93,6 +93,29 @@ vk_check(vkCreateInstance(&create_info, nullptr& m_instance))
 * Pointer to custom alloator callbacks, default to `nullptr`
 * Pointer to variable; stores the handle to new object
 
+
+## Validation Layers
+
+In vulkan, validation layers are helpful for debugging. It provides debugging capabilities that can make developing vulkan code easier.
+
+In the code you will see validation layers be initialized as the following. These can be toggle between debug and release builds.
+
+```C++
+const std::vector<const char*> validation_layers = {
+    "VK_LAYER_KHRONOS_validation"
+};
+```
+
+## Debugging Callback
+
+When creating the `VkInstance`, there is a `debug_callback` which is used for performing debugging statements. This callback is specifically useful for validating instances that have been created through `vkDestroyDebugUtilsMessengerEXT`.
+
+That requires a valid instance handler. The `VkDebugUtilsMessengerCreateInfoEXT` struct requires the same members
+
+`sType` - is a member for specifying what kinds of struct type this vulkan create information is.
+`messageSeverity` - a member for specifying message severity of the logs the validation layers will provide you.
+`pfnUserCallback` - is the `debug_callback` member that is a proxy functino that will be used for processing the logged validation layers to stderr. 
+
 ## Thats it!
 
 There you go! You instantiated your very first vulkan object, which is the instance that instantiates the vulkan API.
@@ -105,3 +128,4 @@ This is instantiated inside of a `vk_instance` to simplify handling vulkan objec
 Something you notice is there is a line that has `operator VkInstance() { return m_instance; }`, this allows to treat the object of `vk_instance` as a literal vulkan object that can be passed to the vulkan API.
 
 Rather then having a getter `get_instance_handler()`, you can pass in the object itself and because C++ has type inference. The vulkan API would infer its type of the object as if its a `VkInstance` type.
+
