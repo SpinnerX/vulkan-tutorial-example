@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <GLFW/glfw3.h>
+#include "helper_functions.hpp"
 
 const std::vector<const char*> validation_layers = {
     "VK_LAYER_KHRONOS_validation"
@@ -12,23 +13,38 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverity
     return false;
 }
 
-static std::vector<const char*> get_required_extensions() {
-    uint32_t glfw_extension_count = 0;
-    const char** glfw_extensions;
-    glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+std::vector<const char*> initialize_instance_extensions() {
+    std::vector<const char*> extension_names;
 
-    std::vector<const char*> extensions(glfw_extensions, glfw_extensions + glfw_extension_count);
+    extension_names.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
 
-    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    // An additional surface extension needs to be loaded. This extension is
+    // platform-specific so needs to be selected based on the platform the
+    // example is going to be deployed to. Preprocessor directives are used
+    // here to select the correct platform.
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+    extension_names.emplace_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+#endif
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+    extensionNames.emplace_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
+#endif
+#ifdef VK_USE_PLATFORM_XCB_KHR
+    extensionNames.emplace_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+#endif
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+    extensionNames.emplace_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
+#endif
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+    extensionNames.emplace_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+#endif
+#ifdef VK_USE_PLATFORM_MACOS_MVK
+    extensionNames.emplace_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
+#endif
+#ifdef USE_PLATFORM_NULLWS
+    extensionNames.emplace_back(VK_KHR_DISPLAY_EXTENSION_NAME);
+#endif
 
-    return extensions;
-}
-
-void vk_check(const VkResult& p_result,
-                  const char* p_tag){
-    if(p_result != VK_SUCCESS) {
-        printf("%s errorred with status %i\n", p_tag, (int)p_result);
-    }
+    return extension_names;
 }
 
 vk_instance::vk_instance(const std::string& p_name) {
@@ -49,7 +65,8 @@ vk_instance::vk_instance(const std::string& p_name) {
     };
 
     //! @note Setting up the required extensions for vulkan
-    std::vector<const char*> extensions = get_required_extensions();
+    std::vector<const char*> extensions = initialize_instance_extensions();
+    extensions.push_back("VK_EXT_debug_utils");
     create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     create_info.ppEnabledExtensionNames = extensions.data();
 

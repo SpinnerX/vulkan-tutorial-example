@@ -6,7 +6,6 @@ build_application(
     SOURCES
     application.cpp
     vk_context.cpp
-    helper_functions.cpp
 
     PACKAGES
     glfw3
