@@ -37,6 +37,8 @@ vk_physical_driver::vk_physical_driver(const VkInstance& p_instance) {
     
     m_queue_family_properties.resize(queue_family_count);
     vkGetPhysicalDeviceQueueFamilyProperties(m_physical, &queue_family_count, m_queue_family_properties.data());
+
+    m_queue_indices = select_queue_family_indices();
 }
 
 vk_physical_driver::queue_family_indices vk_physical_driver::select_queue_family_indices() {
