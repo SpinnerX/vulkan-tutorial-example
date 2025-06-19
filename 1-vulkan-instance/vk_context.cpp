@@ -2,7 +2,6 @@
 #include <vector>
 #include <iostream>
 #include <GLFW/glfw3.h>
-#include "helper_functions.hpp"
 
 const std::vector<const char*> validation_layers = {
     "VK_LAYER_KHRONOS_validation"
@@ -45,6 +44,13 @@ std::vector<const char*> initialize_instance_extensions() {
 #endif
 
     return extension_names;
+}
+
+void vk_check(const VkResult& p_result,
+                  const char* p_tag){
+    if(p_result != VK_SUCCESS) {
+        printf("%s errorred with status %i\n", p_tag, (int)p_result);
+    }
 }
 
 vk_instance::vk_instance(const std::string& p_name) {
